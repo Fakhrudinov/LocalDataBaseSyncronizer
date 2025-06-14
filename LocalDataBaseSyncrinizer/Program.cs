@@ -20,6 +20,7 @@ namespace LocalDataBaseSyncrinizer
 
             app.UseAuthorization();
 
+			//https://dotnettutorials.net/lesson/swagger-api-in-asp-net-core-web-api/
 			app.UseSwagger();
 			app.UseSwaggerUI();
 
