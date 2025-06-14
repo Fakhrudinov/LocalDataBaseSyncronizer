@@ -1,0 +1,6 @@
+@LocalDataBaseSyncrinizer_HostAddress = http://localhost:5029
+
+GET {{LocalDataBaseSyncrinizer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
