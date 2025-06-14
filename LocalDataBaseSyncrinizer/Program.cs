@@ -1,3 +1,6 @@
+using DataAbstraction.Settings;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace LocalDataBaseSyncrinizer
 {
     public class Program

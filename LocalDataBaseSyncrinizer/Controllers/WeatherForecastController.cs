@@ -1,4 +1,6 @@
+using DataAbstraction.Settings;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace LocalDataBaseSyncrinizer.Controllers
 {
@@ -10,13 +12,18 @@ namespace LocalDataBaseSyncrinizer.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
         private readonly ILogger<WeatherForecastController> _logger;
+		private IConfiguration Configuration;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+		public WeatherForecastController(ILogger<WeatherForecastController> logger
+
+            , IConfiguration configuration
+			)
         {
-            _logger = logger;
-        }
+			Configuration = configuration;
+			_logger = logger;
+			var some = Configuration.GetSection("DataBaseList").Get<List<DataBaseConnectionSettings>>();
+		}
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
