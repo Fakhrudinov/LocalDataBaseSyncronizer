@@ -1,5 +1,7 @@
-using DataAbstraction.Settings;
-using Microsoft.Extensions.DependencyInjection;
+using DataAbstraction.Interfaces;
+using DataBaseRepository;
+using LogicCore;
+
 
 namespace LocalDataBaseSyncrinizer
 {
@@ -16,7 +18,11 @@ namespace LocalDataBaseSyncrinizer
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
+			builder.Services.AddTransient<ILogicCore, Core>();
+			builder.Services.AddTransient<IRepository, Repository>();
+
 			var app = builder.Build();
+
 
 
             // Configure the HTTP request pipeline.

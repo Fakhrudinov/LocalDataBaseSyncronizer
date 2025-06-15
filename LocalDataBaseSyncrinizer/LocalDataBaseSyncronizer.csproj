@@ -12,6 +12,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataAbstraction\DataAbstraction.csproj" />
+    <ProjectReference Include="..\LogicCore\LogicCore.csproj" />
+    <ProjectReference Include="..\Repository\DataBaseRepository.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SQLScripts\" />
   </ItemGroup>
 
 </Project>
