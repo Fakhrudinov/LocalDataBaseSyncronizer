@@ -16,10 +16,18 @@ namespace LocalDataBaseSyncrinizer.Controllers
 			_logger=logger;
 		}
 
-		[HttpPost]
-		public IActionResult FixAddAbsentDataAtAllDB()
+		[HttpGet("Check/DataBase/Is/Accessible")]
+		public async Task<IActionResult> CheckDataBaseIsAccessible()
 		{
-			return Ok();
+			bool result = await _core.CheckDataBaseIsAccessible();
+			return Ok(result);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> FillAbsentDataAtAllDB()
+		{
+			List<string> list = await _core.FillAbsentDataAtAllDB();
+			return Ok(list);
 		}
 	}
 }

@@ -2,8 +2,11 @@
 {
 	public class DataBaseConnectionSettings
 	{
-		public string Name { get; set; } = String.Empty;
-		public int Number { get; set; }
-		public bool SomeBool { get; set; }
+		public string Server { get; set; }
+		public int Port { get; set; }
+		public string Database { get; set; }
+		public string UserId { get; set; }
+		public string Password { get; set; }
+		public bool IsSource { get; set; }
 	}
 }

@@ -20,6 +20,7 @@ namespace LocalDataBaseSyncrinizer
 
 			builder.Services.AddTransient<ILogicCore, Core>();
 			builder.Services.AddTransient<IRepository, Repository>();
+			builder.Services.AddTransient<ICommonRepository, CommonRepository>();
 
 			var app = builder.Build();
 

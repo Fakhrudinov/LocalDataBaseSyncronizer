@@ -17,7 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="SQLScripts\" />
+    <None Update="SqlQueries\CommonScripts\GetLastDateFromTable.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\Incomings\CreateNewIncomingsFromList.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\Incomings\GetIncomingsOlderThanDate.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
