@@ -1,4 +1,5 @@
 ﻿using DataAbstraction.Interfaces;
+using DataAbstraction.Models;
 using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
@@ -14,9 +15,19 @@ namespace DataBaseRepository
 			_logger = logger;
 		}
 
-		public async Task<DateTime?> GetLastDateBySqlQuery(string connectionString, string query)
+		public async Task<DateTime?> GetLastDateFromTable(string connection, string tableName)
 		{
-			using (MySqlConnection con = new MySqlConnection(connectionString))
+			string? query = GetQueryTextByFolderAndFilename("CommonScripts", "GetLastDateFromTable.sql");
+			if (query is null)
+			{
+				return null;
+			}
+
+			//set tableName to script
+			query = query.Replace("@tableName", tableName);
+
+
+			using (MySqlConnection con = new MySqlConnection(connection))
 			{
 				using (MySqlCommand cmd = new MySqlCommand(query))
 				{
@@ -31,14 +42,14 @@ namespace DataBaseRepository
 							while (await sdr.ReadAsync())
 							{
 								DateTime dt = sdr.GetDateTime(0);
-								_logger.LogDebug($"CommonRepository GetLastDateBySqlQuery Date=" + dt.ToString());
+								_logger.LogDebug($"CommonRepository GetLastDateFromTable Date=" + dt.ToString());
 								return dt;
 							}
 						}
 					}
 					catch (Exception ex)
 					{
-						_logger.LogWarning($"CommonRepository GetLastDateBySqlQuery Exception!\r\n{ex.Message}");
+						_logger.LogWarning($"CommonRepository GetLastDateFromTable Exception!\r\n{ex.Message}");
 					}
 					finally
 					{
@@ -49,6 +60,7 @@ namespace DataBaseRepository
 
 			return null;
 		}
+
 
 		public string? GetQueryTextByFolderAndFilename(string folderName, string queryFileName)
 		{
@@ -64,6 +76,53 @@ namespace DataBaseRepository
 				$"\r\n{query}");
 
 			return query;
+		}
+
+		public async Task<List<WishLevelModel>?> GetWishLevels(string connection)
+		{
+			string? query = GetQueryTextByFolderAndFilename("Wish", "GetWishLevelsWeight.sql");
+			if (query is null)
+			{
+				return null;
+			}
+
+			using (MySqlConnection con = new MySqlConnection(connection))
+			{
+				using (MySqlCommand cmd = new MySqlCommand(query))
+				{
+					cmd.Connection = con;
+
+					try
+					{
+						await con.OpenAsync();
+
+						List<WishLevelModel> wishLevels = new List<WishLevelModel>();
+
+						using (MySqlDataReader sdr = await cmd.ExecuteReaderAsync())
+						{
+							while (await sdr.ReadAsync())
+							{
+								WishLevelModel wishLevel = new WishLevelModel();
+								wishLevel.Level = sdr.GetInt32("level");
+								wishLevel.Weight = sdr.GetInt32("weight");
+								wishLevels.Add(wishLevel);
+							}
+						}
+
+						return wishLevels;
+					}
+					catch (Exception ex)
+					{
+						_logger.LogWarning($"CommonRepository GetWishLevels Exception!\r\n{ex.Message}");
+					}
+					finally
+					{
+						await con.CloseAsync();
+					}
+				}
+			}
+
+			return null;
 		}
 	}
 }

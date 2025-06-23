@@ -2,10 +2,8 @@
 {
 	public class LastDatesFromTables
 	{
-		public DateTime ? SourceDate { get; set; }
-		public List<TargetDatesAndConnection> TargetDatesAndConnections { get; set; } = new List<TargetDatesAndConnection>();
-		public bool IsSuccess { get; set; } = true;
-
+		public DateAndConnection SourceData { get; set; } = new DateAndConnection();
+		public List<DateAndConnection> TargetDatesAndConnections { get; set; } = new List<DateAndConnection>();
 		public DateTime Pointer { get; set; } = DateTime.MaxValue;
 	}
 }

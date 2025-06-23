@@ -3,7 +3,6 @@ using DataAbstraction.Models;
 using DataAbstraction.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LogicCore
 {
@@ -77,160 +76,63 @@ namespace LogicCore
 		public async Task<List<string>> FillAbsentDataAtAllDB()
 		{
 			_jobLog = new List<string>();
-			await FillAbsentDataAtIncoming();
+
+			CoreIncoming coreIncoming = new CoreIncoming(
+				_repository,
+				_logger,
+				await GetLastDatesFromTable("incoming")
+				);
+			List<string> jobLogIncom = await coreIncoming.FillAbsentDataAtIncoming();
+			_jobLog.AddRange(jobLogIncom);
+
+			LastDatesFromTables latestDates = await GetLastDatesFromTable("deals");//will be reused at next requests
+			CoreDeals coreDeals = new CoreDeals(
+				_repository,
+				_logger,
+				latestDates
+				);
+			List<string> jobLogDeals = await coreDeals.FillAbsentDataAtDeals();
+			_jobLog.AddRange(jobLogDeals);
+
+			CoreWish coreWish = new CoreWish(
+				_repository,
+				_logger,
+				latestDates
+				);
+			List<string> jobLogWishLevels = await coreWish.CheckAndFixDataAtWishLevels();
+			_jobLog.AddRange(jobLogWishLevels);
 
 			return _jobLog;
-		}
-
-		private async Task FillAbsentDataAtIncoming()
-		{
-			/// work with incoming table ------------------------------------------------------------
-			/// get DateTime source
-			///		if error - scip work <---------
-			/// 
-			/// DateTime pointer - how many data will be requested to fix any tables
-			///		foreach targets:
-			///			if target DateTime is less then source (and pointer)
-			/// if pointer equal source
-			///		- scip work <---------
-			///  
-			/// GET from source: data older then pointer
-			/// foreach target 
-			///		if DateTime.MinValue
-			///			- scip work at this target<---------
-			///		prepare data - remove data older then its pointer
-			///		
-			///	POST data
-
-
-
-			/// work with incoming table
-			/// get DateTime source
-			///		if error - scip work <---------
-
-			LastDatesFromTables lastDatesFromTables = await GetLastDatesFromTable("incoming");
-			if (!lastDatesFromTables.IsSuccess)
-			{
-				// break operation
-				_logger.LogWarning("Error! Fill tables 'incoming' is terminated - no date from source BD");
-				return;
-			}
-
-
-			/// if pointer equal source
-			///		- scip work <---------
-			if (lastDatesFromTables.SourceDate <= lastDatesFromTables.Pointer)
-			{
-				// break operation
-				_logger.LogInformation("Fill tables 'incoming' is terminated - all tables has same data");
-				_jobLog.Add("Fill tables 'incoming' is terminated - all tables has same data");
-				return;
-			}
-
-
-			/// GET from source: data older then pointer
-			/// foreach target 
-			///		if DateTime.MinValue
-			///			- scip work at this target<---------
-			///		prepare data - remove data older then its pointer
-			List<IncomingModel>? incomingsSource = await _repository.GetIncomingsOlderThanDate(
-				lastDatesFromTables.Pointer, 
-				_sourceConnectStr);
-			if (incomingsSource is null)
-			{
-				// break operation
-				_logger.LogInformation("Error! Fill tables 'incoming' is terminated - GetIncomingsOlderThanDate failed");
-				_jobLog.Add("Error! Fill tables 'incoming' is terminated - GetIncomingsOlderThanDate failed");
-				return;
-			}
-
-			foreach (TargetDatesAndConnection table in lastDatesFromTables.TargetDatesAndConnections)
-			{
-				if (!table.IsSuccess)
-				{
-					_logger.LogInformation("Error! Fill table 'incoming' not executed - " +
-						"target date is not filled from " + table.Connection);
-					_jobLog.Add("Error! Fill table 'incoming' not executed - " +
-						"target date is not filled from " + table.Connection);
-					continue;
-				}
-
-				if (table.TargetDate == lastDatesFromTables.SourceDate)
-				{
-					_jobLog.Add($"Fill table 'incoming' from '{table.Connection}' is not needed " +
-						$"- table date({table.TargetDate}) is equal than source date({lastDatesFromTables.SourceDate})");
-					continue;
-				}
-
-				if (table.TargetDate > lastDatesFromTables.SourceDate)
-				{
-					_jobLog.Add($"Error! Fill table 'incoming' from '{table.Connection}' is not needed " +
-						$"- table date({table.TargetDate}) greater than source date({lastDatesFromTables.SourceDate})");
-					continue;
-				}
-
-				// prepare data - remove data older then its pointer
-				List<IncomingModel> dataForTarget = new List<IncomingModel>();
-				foreach (IncomingModel incoming in incomingsSource)
-				{
-					if (incoming.EventDate > table.TargetDate)
-					{
-						dataForTarget.Add(incoming);
-					}
-				}
-
-				if (dataForTarget.Count == 0)
-				{
-					_logger.LogInformation("Error! Fill table 'incoming' not executed - target date is not filled - " +
-						"not any of data items is not older than table already has for " + table.Connection);
-					_jobLog.Add("Error! Fill table 'incoming' not executed - target date is not filled - " +
-						"not any of data items is not older than table already has for " + table.Connection);
-					continue;
-				}
-
-				///	POST data
-				int addToDBCount = await _repository.PostDataToTableIncoming(dataForTarget, table.Connection);
-				if (addToDBCount == 0 || addToDBCount == -1)
-				{
-					_logger.LogInformation("Error! Fill table 'incoming' failed for " + table.Connection);
-					_jobLog.Add("Error! Fill table 'incoming' failed for " + table.Connection);
-				}
-				else
-				{
-					_jobLog.Add($"Fill table 'incoming' succed for '{table.Connection}', filled {addToDBCount} rows");
-				}
-			}
-
-
 		}
 
 		private async Task<LastDatesFromTables> GetLastDatesFromTable(string tableName)
 		{
 			LastDatesFromTables result = new LastDatesFromTables();
 
-			result.SourceDate = await _repository.GetLastDateFromTable(_sourceConnectStr, tableName);
-			if (result.SourceDate is null || result.SourceDate.Equals(DateTime.MinValue))
+			result.SourceData.EventDate = await _repository.GetLastDateFromTable(_sourceConnectStr, tableName);
+			if (result.SourceData.EventDate is null || result.SourceData.EventDate.Equals(DateTime.MinValue))
 			{
 				_jobLog.Add(tableName + " GetLastDatesFromTable source error for connection to " + _sourceConnectStr);
 				_logger.LogError(tableName + " GetLastDatesFromTable source error for connection to " + _sourceConnectStr);
-				result.IsSuccess = false;
+				result.SourceData.IsSuccess = false;
 
 				return result;
 			}
 			else
 			{
-				_logger.LogDebug(tableName + " source GetLastDatesFromTable dt=" + result.SourceDate);
+				result.SourceData.Connection = _sourceConnectStr;
+				_logger.LogDebug(tableName + " source GetLastDatesFromTable dt=" + result.SourceData.EventDate);
 			}
 
 			foreach (string connection in _targetConnectStrList)
 			{
-				TargetDatesAndConnection targetDT = new TargetDatesAndConnection 
-				{ 
+				DateAndConnection targetDT = new DateAndConnection
+				{
 					Connection = connection
 				};
 
-				targetDT.TargetDate = await _repository.GetLastDateFromTable(connection, tableName);
-				if (targetDT.TargetDate is null || targetDT.TargetDate.Equals(DateTime.MinValue))
+				targetDT.EventDate = await _repository.GetLastDateFromTable(connection, tableName);
+				if (targetDT.EventDate is null || targetDT.EventDate.Equals(DateTime.MinValue))
 				{
 					_jobLog.Add(tableName + " GetLastDateFromTable target error for connection to " + connection);
 					_logger.LogError(tableName + " GetLastDateFromTable target error for connection to " + connection);
@@ -238,10 +140,10 @@ namespace LogicCore
 				}
 				else
 				{
-					_logger.LogDebug(tableName + " target GetLastDateFromTable dt=" + targetDT.TargetDate);
-					if(targetDT.TargetDate < result.Pointer)
+					_logger.LogDebug(tableName + " target GetLastDateFromTable dt=" + targetDT.EventDate);
+					if (targetDT.EventDate < result.Pointer)
 					{
-						result.Pointer = (DateTime)targetDT.TargetDate;
+						result.Pointer = (DateTime)targetDT.EventDate;
 					}
 				}
 

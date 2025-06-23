@@ -18,7 +18,7 @@ get last records - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	(`id`, `event_date`, `seccode`, `secboard`, `category`, `value`, `comission`)
 
 
-last 12 records - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+last 6 records from today and all to future - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 `money_by_month` 
 	(`event_date`, `total_in`, `month_in`, `dividend`, `dosrochnoe`, `deals_sum`, `brok_comission`, `money_sum`)
 `money_spent_by_month` 
