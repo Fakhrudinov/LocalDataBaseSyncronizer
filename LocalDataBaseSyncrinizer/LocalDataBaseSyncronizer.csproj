@@ -17,6 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="SqlQueries\BankDeposits\DeleteFromBankDepositsByIdWithSkipList.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\BankDeposits\GetBankDepositsLastRows.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\BankDeposits\PutDataToTableBankDeposits.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\CommonScripts\DeleteFromDateWithSkipList.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\CommonScripts\DeleteFromTableMoneyByMonth.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SqlQueries\CommonScripts\GetLastDateFromTable.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -32,15 +47,47 @@
     <None Update="SqlQueries\Incomings\GetIncomingsOlderThanDate.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="SqlQueries\MoneyByMonth\GetMoneyByMonthAllRowsOlderThanDate.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\MoneyByMonth\PutDataToTableMoneyByMonth.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\MoneySpent\GetMoneySpentByMonthAllRowsOlderThanDate.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\MoneySpent\PutDataToTableMoneySpentByMonth.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\SecCodeInfo\DeleteFromTableSecCodeInfo.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\SecCodeInfo\GetSecCodeInfo.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\SecCodeInfo\PutDataToTableSecCodeInfo.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\Wish\DeleteFromTableWishList.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="SqlQueries\Wish\GetWishLevelsWeight.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="SqlQueries\Wish\GetWishList.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="SqlQueries\Wish\PutDataToTableWishLevels.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="SqlQueries\Wish\PutDataToTableWishList.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="SqlQueries\MoneyByMonth\" />
+    <Folder Include="SqlQueries\SecCodeInfo\" />
     <Folder Include="SqlQueries\Wish\" />
   </ItemGroup>
 

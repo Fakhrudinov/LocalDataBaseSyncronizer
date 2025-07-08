@@ -82,8 +82,9 @@ namespace LogicCore
 				_logger,
 				await GetLastDatesFromTable("incoming")
 				);
-			List<string> jobLogIncom = await coreIncoming.FillAbsentDataAtIncoming();
-			_jobLog.AddRange(jobLogIncom);
+			List<string> jobLogCore = await coreIncoming.FillAbsentDataAtIncoming();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
 
 			LastDatesFromTables latestDates = await GetLastDatesFromTable("deals");//will be reused at next requests
 			CoreDeals coreDeals = new CoreDeals(
@@ -91,16 +92,45 @@ namespace LogicCore
 				_logger,
 				latestDates
 				);
-			List<string> jobLogDeals = await coreDeals.FillAbsentDataAtDeals();
-			_jobLog.AddRange(jobLogDeals);
+			jobLogCore = await coreDeals.FillAbsentDataAtDeals();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
 
 			CoreWish coreWish = new CoreWish(
 				_repository,
 				_logger,
 				latestDates
 				);
-			List<string> jobLogWishLevels = await coreWish.CheckAndFixDataAtWishLevels();
-			_jobLog.AddRange(jobLogWishLevels);
+			jobLogCore = await coreWish.CheckAndFixDataAtWishLevels();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
+
+			jobLogCore = await coreWish.CheckAndFixDataAtWishList();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
+
+			CoreSecCodeInfo coreSecCodeInfo = new CoreSecCodeInfo(
+				_repository,
+				_logger,
+				latestDates
+				);
+			jobLogCore = await coreSecCodeInfo.CheckAndFixDataAtSecCodeInfo();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
+
+			CoreMoneyByMonth coreMoneyByMonth = new CoreMoneyByMonth(_repository, _logger, latestDates);
+			jobLogCore = await coreMoneyByMonth.CheckAndFixMoneyByMonth();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
+
+			CoreMoneySpent coreMoneySpent = new CoreMoneySpent(_repository, _logger, latestDates);
+			jobLogCore = await coreMoneySpent.CheckAndFixMoneySpentByMonth();
+			_jobLog.AddRange(jobLogCore);
+			_jobLog.Add("");
+
+			CoreBankDeposits coreBankDeposits = new CoreBankDeposits(_repository, _logger, latestDates);
+			jobLogCore = await coreBankDeposits.CheckAndFixBankDeposits();
+			_jobLog.AddRange(jobLogCore);
 
 			return _jobLog;
 		}

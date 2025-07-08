@@ -1,0 +1,1 @@
+﻿SELECT `seccode`, `wish_level`, `description` FROM wish_list;

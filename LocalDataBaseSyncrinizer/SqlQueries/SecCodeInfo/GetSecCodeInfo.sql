@@ -1,0 +1,1 @@
+﻿SELECT * FROM seccode_info;

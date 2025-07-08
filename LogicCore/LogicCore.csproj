@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Repository\DataBaseRepository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="PutDataToTableMoneyByMonth.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
