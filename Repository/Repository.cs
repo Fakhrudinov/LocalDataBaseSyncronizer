@@ -996,7 +996,8 @@ namespace DataBaseRepository
 							{
 								MoneySpentByMonthModel mbm = new MoneySpentByMonthModel();
 								// `money_spent_by_month`
-								//(`event_date`, `total`, `appartment`, `electricity`, `internet`, `phone`)
+								//(`event_date`, `total`, `appartment`, `electricity`, `internet`,
+								//`phone`, `transport`, `supermarket`, `marketplaces`)
 								mbm.EventDate = sdr.GetDateTime("event_date");
 
 								int checkForNull0 = sdr.GetOrdinal("total");
@@ -1027,6 +1028,24 @@ namespace DataBaseRepository
 								if (!sdr.IsDBNull(checkForNull4))
 								{
 									mbm.Phone = sdr.GetDecimal("phone");
+								}
+
+								int checkForNull5 = sdr.GetOrdinal("transport");
+								if (!sdr.IsDBNull(checkForNull5))
+								{
+									mbm.Transport = sdr.GetDecimal("transport");
+								}
+
+								int checkForNull6 = sdr.GetOrdinal("supermarket");
+								if (!sdr.IsDBNull(checkForNull6))
+								{
+									mbm.SuperMarkets = sdr.GetDecimal("supermarket");
+								}
+
+								int checkForNull7 = sdr.GetOrdinal("marketplaces");
+								if (!sdr.IsDBNull(checkForNull7))
+								{
+									mbm.MarketPlaces = sdr.GetDecimal("marketplaces");
 								}
 
 								result.Add(mbm);
@@ -1063,7 +1082,7 @@ namespace DataBaseRepository
 				{
 					cmd.Connection = con;
 
-					//(`event_date`, `total`, `appartment`, `electricity`, `internet`, `phone`)
+					//(`event_date`, `total`, `appartment`, `electricity`, `internet`, `phone`, `transport`, `supermarket`, `marketplaces`)
 					for (int i = 0; i < list.Count(); i++)
 					{
 						cmd.Parameters.AddWithValue("@event_date" + i, list[i].EventDate);
@@ -1112,6 +1131,33 @@ namespace DataBaseRepository
 						{
 							cmd.Parameters.AddWithValue("@phone" + i, DBNull.Value);
 						}
+
+						if (list[i].Transport is not null)
+						{
+							cmd.Parameters.AddWithValue("@transport" + i, list[i].Transport);
+						}
+						else
+						{
+							cmd.Parameters.AddWithValue("@transport" + i, DBNull.Value);
+						}
+
+						if (list[i].SuperMarkets is not null)
+						{
+							cmd.Parameters.AddWithValue("@supermarket" + i, list[i].SuperMarkets);
+						}
+						else
+						{
+							cmd.Parameters.AddWithValue("@supermarket" + i, DBNull.Value);
+						}
+
+						if (list[i].MarketPlaces is not null)
+						{
+							cmd.Parameters.AddWithValue("@marketplaces" + i, list[i].MarketPlaces);
+						}
+						else
+						{
+							cmd.Parameters.AddWithValue("@marketplaces" + i, DBNull.Value);
+						}
 					}
 
 					try
@@ -1156,11 +1202,12 @@ namespace DataBaseRepository
 			StringBuilder query = new StringBuilder(queryStr);
 			StringBuilder parameters = new StringBuilder();
 
-			//(`event_date`, `total`, `appartment`, `electricity`, `internet`, `phone`)
+			//(`event_date`, `total`, `appartment`, `electricity`, `internet`, `phone`, `transport`, `supermarket`, `marketplaces`)
 			for (int i = 0; i < count; i++)
 			{
 				parameters.Append($"),\r\n(" +
-					$"@event_date{i}, @total{i}, @appartment{i}, @electricity{i}, @internet{i}, @phone{i}");
+					$"@event_date{i}, @total{i}, @appartment{i}, @electricity{i}, @internet{i}, " +
+					$"@phone{i}, @transport{i}, @supermarket{i}, @marketplaces{i}");
 			}
 			parameters.Remove(0, 5);
 			string parametersStr = parameters.ToString();
